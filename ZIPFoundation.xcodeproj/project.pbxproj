@@ -187,7 +187,7 @@
 				LastUpgradeCheck = 0930;
 				TargetAttributes = {
 					"ZIPFoundation::ZIPFoundation" = {
-						LastSwiftMigration = 0900;
+						LastSwiftMigration = 1020;
 					};
 					"ZIPFoundation::ZIPFoundationTests" = {
 						LastSwiftMigration = 0900;
@@ -425,8 +425,7 @@
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
-				SWIFT_SWIFT3_OBJC_INFERENCE = Off;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 				TARGET_NAME = ZIPFoundation;
 			};
 			name = Debug;
@@ -451,8 +450,7 @@
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
-				SWIFT_SWIFT3_OBJC_INFERENCE = Off;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 				TARGET_NAME = ZIPFoundation;
 			};
 			name = Release;
