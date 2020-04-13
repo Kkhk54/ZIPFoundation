@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		95B5A3D42366731B00D4D8FD /* Archive+MemoryFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95B5A3D32366731B00D4D8FD /* Archive+MemoryFile.swift */; };
+		95B5A3D72367999900D4D8FD /* ZIPFoundationMemoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95B5A3D52367983A00D4D8FD /* ZIPFoundationMemoryTests.swift */; };
 		BA3716AB21F0A238006E54E6 /* ZIPFoundationProgressTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA3716A921F0A1AC006E54E6 /* ZIPFoundationProgressTests.swift */; };
 		OBJ_33 /* ZIPFoundationDataSerializationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_18 /* ZIPFoundationDataSerializationTests.swift */; };
 		OBJ_34 /* ZIPFoundationEntryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_19 /* ZIPFoundationEntryTests.swift */; };
@@ -36,6 +38,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		95B5A3D32366731B00D4D8FD /* Archive+MemoryFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Archive+MemoryFile.swift"; sourceTree = "<group>"; };
+		95B5A3D52367983A00D4D8FD /* ZIPFoundationMemoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZIPFoundationMemoryTests.swift; sourceTree = "<group>"; };
 		BA3716A921F0A1AC006E54E6 /* ZIPFoundationProgressTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZIPFoundationProgressTests.swift; sourceTree = "<group>"; };
 		OBJ_10 /* Archive+Writing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Archive+Writing.swift"; sourceTree = "<group>"; };
 		OBJ_11 /* Archive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Archive.swift; sourceTree = "<group>"; };
@@ -53,7 +57,7 @@
 		OBJ_6 /* Package.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		OBJ_9 /* Archive+Reading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Archive+Reading.swift"; sourceTree = "<group>"; };
 		"ZIPFoundation::ZIPFoundation::Product" /* ZIPFoundation.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ZIPFoundation.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		"ZIPFoundation::ZIPFoundationTests::Product" /* ZIPFoundationTests.xctest */ = {isa = PBXFileReference; lastKnownFileType = file; path = ZIPFoundationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		"ZIPFoundation::ZIPFoundationTests::Product" /* ZIPFoundationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = ZIPFoundationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,6 +93,7 @@
 				OBJ_23 /* ZIPFoundationTests.swift */,
 				OBJ_22 /* ZIPFoundationReadingTests.swift */,
 				OBJ_24 /* ZIPFoundationWritingTests.swift */,
+				95B5A3D52367983A00D4D8FD /* ZIPFoundationMemoryTests.swift */,
 				OBJ_19 /* ZIPFoundationEntryTests.swift */,
 				OBJ_18 /* ZIPFoundationDataSerializationTests.swift */,
 				OBJ_20 /* ZIPFoundationFileManagerTests.swift */,
@@ -132,6 +137,7 @@
 				OBJ_11 /* Archive.swift */,
 				OBJ_9 /* Archive+Reading.swift */,
 				OBJ_10 /* Archive+Writing.swift */,
+				95B5A3D32366731B00D4D8FD /* Archive+MemoryFile.swift */,
 				OBJ_14 /* Entry.swift */,
 				OBJ_12 /* Data+Compression.swift */,
 				OBJ_13 /* Data+Serialization.swift */,
@@ -184,19 +190,19 @@
 		OBJ_1 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0930;
+				LastUpgradeCheck = 1020;
 				TargetAttributes = {
 					"ZIPFoundation::ZIPFoundation" = {
 						LastSwiftMigration = 1020;
 					};
 					"ZIPFoundation::ZIPFoundationTests" = {
-						LastSwiftMigration = 0900;
+						LastSwiftMigration = 1020;
 					};
 				};
 			};
 			buildConfigurationList = OBJ_2 /* Build configuration list for PBXProject "ZIPFoundation" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
@@ -240,6 +246,7 @@
 				OBJ_35 /* ZIPFoundationFileManagerTests.swift in Sources */,
 				OBJ_36 /* ZIPFoundationPerformanceTests.swift in Sources */,
 				OBJ_37 /* ZIPFoundationReadingTests.swift in Sources */,
+				95B5A3D72367999900D4D8FD /* ZIPFoundationMemoryTests.swift in Sources */,
 				OBJ_38 /* ZIPFoundationTests.swift in Sources */,
 				OBJ_39 /* ZIPFoundationWritingTests.swift in Sources */,
 			);
@@ -253,6 +260,7 @@
 				OBJ_49 /* Archive+Writing.swift in Sources */,
 				OBJ_50 /* Archive.swift in Sources */,
 				OBJ_51 /* Data+Compression.swift in Sources */,
+				95B5A3D42366731B00D4D8FD /* Archive+MemoryFile.swift in Sources */,
 				OBJ_52 /* Data+Serialization.swift in Sources */,
 				OBJ_53 /* Entry.swift in Sources */,
 				OBJ_54 /* FileManager+ZIP.swift in Sources */,
@@ -273,6 +281,7 @@
 		OBJ_3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -315,6 +324,7 @@
 				SUPPORTED_PLATFORMS = "macosx iphoneos iphonesimulator appletvos appletvsimulator watchos watchsimulator";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.0;
 				TVOS_DEPLOYMENT_TARGET = 9.0;
 				USE_HEADERMAP = NO;
 				WATCHOS_DEPLOYMENT_TARGET = 2.0;
@@ -334,8 +344,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks @loader_path/Frameworks";
 				OTHER_LDFLAGS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "$(inherited)";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Off;
-				SWIFT_VERSION = 4.0;
 				TARGET_NAME = ZIPFoundationTests;
 			};
 			name = Debug;
@@ -354,8 +362,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks @loader_path/Frameworks";
 				OTHER_LDFLAGS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "$(inherited)";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Off;
-				SWIFT_VERSION = 4.0;
 				TARGET_NAME = ZIPFoundationTests;
 			};
 			name = Release;
@@ -363,6 +369,7 @@
 		OBJ_4 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -401,6 +408,7 @@
 				SDKROOT = "";
 				SUPPORTED_PLATFORMS = "macosx iphoneos iphonesimulator appletvos appletvsimulator watchos watchsimulator";
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 4.0;
 				TVOS_DEPLOYMENT_TARGET = 9.0;
 				USE_HEADERMAP = NO;
 				WATCHOS_DEPLOYMENT_TARGET = 2.0;
@@ -411,7 +419,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
-				CURRENT_PROJECT_VERSION = 0.9.8;
+				CURRENT_PROJECT_VERSION = 0.9.11;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
 				ENABLE_TESTABILITY = YES;
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = ZIPFoundation.xcodeproj/ZIPFoundation_Info.plist;
@@ -422,11 +432,10 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=watchos*]" = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				OTHER_LDFLAGS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "$(inherited)";
-				PRODUCT_BUNDLE_IDENTIFIER = ZIPFoundation;
+				PRODUCT_BUNDLE_IDENTIFIER = com.peakstep.ZIPFoundation;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 5.0;
 				TARGET_NAME = ZIPFoundation;
 			};
 			name = Debug;
@@ -435,7 +444,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
-				CURRENT_PROJECT_VERSION = 0.9.8;
+				CURRENT_PROJECT_VERSION = 0.9.11;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
 				ENABLE_TESTABILITY = YES;
 				GCC_OPTIMIZATION_LEVEL = fast;
 				HEADER_SEARCH_PATHS = "$(inherited)";
@@ -447,11 +458,10 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=watchos*]" = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				OTHER_LDFLAGS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "$(inherited)";
-				PRODUCT_BUNDLE_IDENTIFIER = ZIPFoundation;
+				PRODUCT_BUNDLE_IDENTIFIER = com.peakstep.ZIPFoundation;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 5.0;
 				TARGET_NAME = ZIPFoundation;
 			};
 			name = Release;

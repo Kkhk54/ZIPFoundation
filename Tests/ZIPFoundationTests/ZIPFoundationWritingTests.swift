@@ -2,7 +2,7 @@
 //  ZIPFoundationWritingTests.swift
 //  ZIPFoundation
 //
-//  Copyright © 2017-2019 Thomas Zoechling, https://www.peakstep.com and the ZIP Foundation project authors.
+//  Copyright © 2017-2020 Thomas Zoechling, https://www.peakstep.com and the ZIP Foundation project authors.
 //  Released under the MIT License.
 //
 //  See https://github.com/weichsel/ZIPFoundation/blob/master/LICENSE for license information.
@@ -20,7 +20,7 @@ extension ZIPFoundationTests {
             let baseURL = assetURL.deletingLastPathComponent()
             try archive.addEntry(with: relativePath, relativeTo: baseURL)
         } catch {
-            XCTFail("Failed to add entry to uncompressed folder archive with error : \(error)")
+            XCTFail("Failed to add uncompressed entry archive with error : \(error)")
         }
         XCTAssert(archive.checkIntegrity())
     }
@@ -33,7 +33,7 @@ extension ZIPFoundationTests {
             let baseURL = assetURL.deletingLastPathComponent()
             try archive.addEntry(with: relativePath, relativeTo: baseURL, compressionMethod: .deflate)
         } catch {
-            XCTFail("Failed to add entry to uncompressed folder archive with error : \(error)")
+            XCTFail("Failed to add compressed entry folder archive : \(error)")
         }
         let entry = archive[assetURL.lastPathComponent]
         XCTAssertNotNil(entry)
@@ -54,9 +54,7 @@ extension ZIPFoundationTests {
         let tempDirectoryURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(uniqueString)
         do {
             let fileManager = FileManager()
-            try fileManager.createDirectory(at: tempDirectoryURL,
-                                            withIntermediateDirectories: true,
-                                            attributes: nil)
+            try fileManager.createDirectory(at: tempDirectoryURL, withIntermediateDirectories: true, attributes: nil)
             let relativePath = tempDirectoryURL.lastPathComponent
             let baseURL = tempDirectoryURL.deletingLastPathComponent()
             try archive.addEntry(with: relativePath + "/", relativeTo: baseURL)
@@ -132,6 +130,36 @@ extension ZIPFoundationTests {
         XCTAssertTrue(didCatchExpectedError)
     }
 
+    func testCreateArchiveAddZeroSizeUncompressedEntry() {
+        let archive = self.archive(for: #function, mode: .create)
+        let assetURL = self.resourceURL(for: #function, pathExtension: "txt")
+        do {
+            let relativePath = assetURL.lastPathComponent
+            let baseURL = assetURL.deletingLastPathComponent()
+            try archive.addEntry(with: relativePath, relativeTo: baseURL)
+        } catch {
+            XCTFail("Failed to add zero-size uncompressed entry to archive with error : \(error)")
+        }
+        let entry = archive[assetURL.lastPathComponent]
+        XCTAssertNotNil(entry)
+        XCTAssert(archive.checkIntegrity())
+    }
+
+    func testCreateArchiveAddZeroSizeCompressedEntry() {
+        let archive = self.archive(for: #function, mode: .create)
+        let assetURL = self.resourceURL(for: #function, pathExtension: "txt")
+        do {
+            let relativePath = assetURL.lastPathComponent
+            let baseURL = assetURL.deletingLastPathComponent()
+            try archive.addEntry(with: relativePath, relativeTo: baseURL, compressionMethod: .deflate)
+        } catch {
+            XCTFail("Failed to add zero-size compressed entry to archive with error : \(error)")
+        }
+        let entry = archive[assetURL.lastPathComponent]
+        XCTAssertNotNil(entry)
+        XCTAssert(archive.checkIntegrity())
+    }
+
     func testCreateArchiveAddLargeUncompressedEntry() {
         let archive = self.archive(for: #function, mode: .create)
         let size = 1024*1024*20
@@ -187,7 +215,7 @@ extension ZIPFoundationTests {
         do {
             try archive.addEntry(with: fileName, type: .file, uncompressedSize: UINT32_MAX,
                                  provider: { (_, chunkSize) -> Data in
-                return Data.makeRandomData(size: chunkSize)
+                return Data(count: chunkSize)
             })
         } catch let error as Archive.ArchiveError {
             XCTAssertNotNil(error == .invalidStartOfCentralDirectoryOffset)
@@ -299,4 +327,73 @@ extension ZIPFoundationTests {
         let nonUpdatableArchive = Archive(url: nonUpdatableArchiveURL, accessMode: .update)
         XCTAssertNil(nonUpdatableArchive)
     }
+
+    func testReplaceCurrentArchiveWithArchiveCrossLink() {
+		#if os(macOS)
+        let createVolumeExpectation = expectation(description: "Creation of temporary additional volume")
+        let unmountVolumeExpectation = expectation(description: "Unmount temporary additional volume")
+        let tempDir = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(UUID().uuidString)
+        do {
+            try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true, attributes: nil)
+            let volName = "Test_\(UUID().uuidString)"
+            let task = try self.makeVolumeCreationTask(at: tempDir, volumeName: volName)
+            task.execute { (error) in
+                guard error == nil else {
+                    XCTFail("\(String(describing: error))")
+                    return
+                }
+                let vol2URL = URL(fileURLWithPath: "/Volumes/\(volName)")
+                defer {
+                    FileManager.default.unmountVolume(at: vol2URL, options:
+                        [.allPartitionsAndEjectDisk, .withoutUI], completionHandler: { (error) in
+                            guard error == nil else {
+                                XCTFail("\(String(describing: error))")
+                                return
+                            }
+                            unmountVolumeExpectation.fulfill()
+                    })
+                }
+                let vol1ArchiveURL = tempDir.appendingPathComponent("vol1Archive")
+                let vol2ArchiveURL = vol2URL.appendingPathComponent("vol2Archive")
+                guard let vol1Archive = Archive(url: vol1ArchiveURL, accessMode: .create),
+                    let vol2Archive = Archive(url: vol2ArchiveURL, accessMode: .create) else {
+                    XCTFail("Failed to create test archive '\(vol2ArchiveURL)'")
+                    type(of: self).tearDown()
+                    return
+                }
+
+                do {
+                    try vol1Archive.replaceCurrentArchiveWithArchive(at: vol2Archive.url)
+                } catch {
+                    XCTFail("\(String(describing: error))")
+                    return
+                }
+                createVolumeExpectation.fulfill()
+            }
+        } catch {
+            XCTFail("\(error)")
+            return
+        }
+        defer { try? FileManager.default.removeItem(at: tempDir) }
+
+        waitForExpectations(timeout: 30.0)
+		#endif
+    }
+
+    #if os(macOS)
+    private func makeVolumeCreationTask(at tempDir: URL, volumeName: String) throws -> NSUserScriptTask {
+        let scriptURL = tempDir.appendingPathComponent("createVol.sh", isDirectory: false)
+        let dmgURL = tempDir.appendingPathComponent(volumeName).appendingPathExtension("dmg")
+        let script = """
+        #!/bin/bash
+        hdiutil create -size 5m -fs HFS+ -type SPARSEBUNDLE -ov -volname "\(volumeName)" "\(dmgURL.path)"
+        hdiutil attach -nobrowse "\(dmgURL.appendingPathExtension("sparsebundle").path)"
+
+        """
+        try script.write(to: scriptURL, atomically: false, encoding: .utf8)
+        let permissions = NSNumber(value: Int16(0o770))
+        try FileManager.default.setAttributes([.posixPermissions: permissions], ofItemAtPath: scriptURL.path)
+        return try NSUserScriptTask(url: scriptURL)
+    }
+    #endif
 }

@@ -2,7 +2,7 @@
 //  ZIPFoundationReadingTests.swift
 //  ZIPFoundation
 //
-//  Copyright © 2017-2019 Thomas Zoechling, https://www.peakstep.com and the ZIP Foundation project authors.
+//  Copyright © 2017-2020 Thomas Zoechling, https://www.peakstep.com and the ZIP Foundation project authors.
 //  Released under the MIT License.
 //
 //  See https://github.com/weichsel/ZIPFoundation/blob/master/LICENSE for license information.
@@ -16,16 +16,16 @@ extension ZIPFoundationTests {
         let archive = self.archive(for: #function, mode: .read)
         for entry in archive {
             do {
-                //Test extracting to memory
+                // Test extracting to memory
                 var checksum = try archive.extract(entry, bufferSize: 32, consumer: { _ in })
                 XCTAssert(entry.checksum == checksum)
-                //Test extracting to file
+                // Test extracting to file
                 var fileURL = self.createDirectory(for: #function)
                 fileURL.appendPathComponent(entry.path)
                 checksum = try archive.extract(entry, to: fileURL)
                 XCTAssert(entry.checksum == checksum)
                 let fileManager = FileManager()
-                XCTAssertTrue(fileManager.fileExists(atPath: fileURL.path))
+                XCTAssertTrue(fileManager.itemExists(at: fileURL))
                 if entry.type == .file {
                     let fileData = try Data(contentsOf: fileURL)
                     let checksum = fileData.crc32(checksum: 0)
@@ -50,7 +50,7 @@ extension ZIPFoundationTests {
                 checksum = try archive.extract(entry, to: fileURL)
                 XCTAssert(entry.checksum == checksum)
                 let fileManager = FileManager()
-                XCTAssertTrue(fileManager.fileExists(atPath: fileURL.path))
+                XCTAssertTrue(fileManager.itemExists(at: fileURL))
                 if entry.type != .directory {
                     let fileData = try Data(contentsOf: fileURL)
                     let checksum = fileData.crc32(checksum: 0)
@@ -84,6 +84,16 @@ extension ZIPFoundationTests {
                 XCTFail("Failed to unzip data descriptor archive")
             }
         }
+    }
+
+    func testExtractPreferredEncoding() {
+        let encoding = String.Encoding.utf8
+        let archive = self.archive(for: #function, mode: .read, preferredEncoding: encoding)
+        XCTAssertTrue(archive.checkIntegrity())
+        let imageEntry = archive["data/pic👨‍👩‍👧‍👦🎂.jpg"]
+        XCTAssertNotNil(imageEntry)
+        let textEntry = archive["data/Benoît.txt"]
+        XCTAssertNotNil(textEntry)
     }
 
     func testExtractMSDOSArchive() {
@@ -150,7 +160,7 @@ extension ZIPFoundationTests {
             fseek(destinationFile, 64, SEEK_SET)
             // We have to inject a large enough zeroes block to guarantee that libcompression 
             // detects the failure when reading the stream
-            _ = try Data.write(chunk: Data.init(count: 512*1024), to: destinationFile)
+            _ = try Data.write(chunk: Data(count: 512*1024), to: destinationFile)
             fclose(destinationFile)
             guard let archive = Archive(url: archiveURL, accessMode: .read) else {
                 XCTFail("Failed to read archive.")
@@ -222,9 +232,9 @@ extension ZIPFoundationTests {
         let progress = archive.makeProgressForReading(entry)
         do {
             var readCount = 0
-            _ = try archive.extract(entry, bufferSize: 1, progress: progress) { (_) in
-                if readCount == 3 { progress.cancel() }
-                readCount += 1
+            _ = try archive.extract(entry, bufferSize: 1, progress: progress) { (data) in
+                readCount += data.count
+                if readCount == 4 { progress.cancel() }
             }
         } catch let error as Archive.ArchiveError {
             XCTAssert(error == Archive.ArchiveError.cancelledOperation)
@@ -236,13 +246,13 @@ extension ZIPFoundationTests {
 
     func testExtractCompressedEntryCancelation() {
         let archive = self.archive(for: #function, mode: .read)
-        guard let entry = archive["original"] else { XCTFail("Failed to extract entry."); return }
+        guard let entry = archive["random"] else { XCTFail("Failed to extract entry."); return }
         let progress = archive.makeProgressForReading(entry)
         do {
             var readCount = 0
-            _ = try archive.extract(entry, bufferSize: 1, progress: progress) { (_) in
-                if readCount == 3 { progress.cancel() }
-                readCount += 1
+            _ = try archive.extract(entry, bufferSize: 256, progress: progress) { (data) in
+                readCount += data.count
+                if readCount == 512 { progress.cancel() }
             }
         } catch let error as Archive.ArchiveError {
             XCTAssert(error == Archive.ArchiveError.cancelledOperation)

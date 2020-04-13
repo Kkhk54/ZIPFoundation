@@ -2,7 +2,7 @@
 //  ZIPFoundationFileManagerTests.swift
 //  ZIPFoundation
 //
-//  Copyright © 2017-2019 Thomas Zoechling, https://www.peakstep.com and the ZIP Foundation project authors.
+//  Copyright © 2017-2020 Thomas Zoechling, https://www.peakstep.com and the ZIP Foundation project authors.
 //  Released under the MIT License.
 //
 //  See https://github.com/weichsel/ZIPFoundation/blob/master/LICENSE for license information.
@@ -93,7 +93,9 @@ extension ZIPFoundationTests {
                                                         attributes: noPermissionAttributes)
             XCTAssert(result == true)
             try fileManager.zipItem(at: unreadableFileURL.deletingLastPathComponent(), to: directoryArchiveURL)
-        } catch let error as CocoaError { XCTAssert(error.code == CocoaError.fileReadNoPermission) } catch {
+        } catch let error as CocoaError {
+            XCTAssert(error.code == CocoaError.fileReadNoPermission)
+        } catch {
             XCTFail("Unexpected error while trying to zip via fileManager.")
         }
     }
@@ -110,7 +112,26 @@ extension ZIPFoundationTests {
         var itemsExist = false
         for entry in archive {
             let directoryURL = destinationURL.appendingPathComponent(entry.path)
-            itemsExist = fileManager.fileExists(atPath: directoryURL.path)
+            itemsExist = fileManager.itemExists(at: directoryURL)
+            if !itemsExist { break }
+        }
+        XCTAssert(itemsExist)
+    }
+
+    func testUnzipItemWithPreferredEncoding() {
+        let fileManager = FileManager()
+        let encoding = String.Encoding.utf8
+        let archive = self.archive(for: #function, mode: .read, preferredEncoding: encoding)
+        let destinationURL = self.createDirectory(for: #function)
+        do {
+            try fileManager.unzipItem(at: archive.url, to: destinationURL, preferredEncoding: encoding)
+        } catch {
+            XCTFail("Failed to extract item."); return
+        }
+        var itemsExist = false
+        for entry in archive {
+            let directoryURL = destinationURL.appendingPathComponent(entry.path(using: encoding))
+            itemsExist = fileManager.itemExists(at: directoryURL)
             if !itemsExist { break }
         }
         XCTAssert(itemsExist)
@@ -167,7 +188,7 @@ extension ZIPFoundationTests {
                                  0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,
                                  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                  0xb0, 0x11, 0x00, 0x00, 0x00, 0x00]
-        guard let cds = Entry.CentralDirectoryStructure(data: Data(bytes: cdsBytes),
+        guard let cds = Entry.CentralDirectoryStructure(data: Data(cdsBytes),
                                                         additionalDataProvider: { count -> Data in
                                                             guard let pathData = "/".data(using: .utf8) else {
                                                                 throw AdditionalDataError.encodingError
@@ -181,7 +202,7 @@ extension ZIPFoundationTests {
                                  0x08, 0x00, 0xab, 0x85, 0x77, 0x47, 0x00, 0x00,
                                  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                  0x00, 0x00, 0x00, 0x00, 0x00, 0x00]
-        guard let lfh = Entry.LocalFileHeader(data: Data(bytes: lfhBytes),
+        guard let lfh = Entry.LocalFileHeader(data: Data(lfhBytes),
                                               additionalDataProvider: { _ -> Data in
                                                 return Data()
         }) else {
@@ -190,22 +211,11 @@ extension ZIPFoundationTests {
         guard let entry = Entry(centralDirectoryStructure: cds, localFileHeader: lfh, dataDescriptor: nil) else {
             XCTFail("Failed to create test entry."); return
         }
-        var attributes = FileManager.attributes(from: entry)
+        let attributes = FileManager.attributes(from: entry)
         guard let permissions = attributes[.posixPermissions] as? UInt16 else {
             XCTFail("Failed to read file attributes."); return
         }
         XCTAssert(permissions == defaultDirectoryPermissions)
-    }
-
-    func testFilePermissionErrorConditions() {
-        do {
-            let deviceURL = URL(fileURLWithPath: "/dev/zero")
-            _ = try FileManager.permissionsForItem(at: deviceURL)
-            let unreadableURL = URL(fileURLWithPath: "/unreadable")
-            _ = try FileManager.permissionsForItem(at: unreadableURL)
-        } catch let error as CocoaError {
-            XCTAssert(error.code == CocoaError.fileReadNoSuchFile)
-        } catch { XCTFail("Unexpected error while testing permissions."); return }
     }
 
     func testFilePermissionHelperMethods() {
@@ -265,7 +275,9 @@ extension ZIPFoundationTests {
             _ = try FileManager.typeForItem(at: nonFileURL)
         } catch let error as CocoaError {
             XCTAssert(error.code == CocoaError.fileReadNoSuchFile)
-        } catch { XCTFail("Unexpected error while trying to retrieve file type") }
+        } catch {
+            XCTFail("Unexpected error while trying to retrieve file type")
+        }
     }
 
     func testFileModificationDate() {
@@ -333,5 +345,21 @@ extension ZIPFoundationTests {
             XCTAssert((error as? CocoaError)?.code == .fileReadInvalidFileName); return
         }
         XCTFail("Extraction should fail")
+    }
+
+    func testUniqueTemporaryDirectoryURL() {
+        let archive = self.archive(for: #function, mode: .create)
+        var tempURLs = Set<URL>()
+        defer {
+            for url in tempURLs {
+                try? FileManager.default.removeItem(at: url)
+            }
+        }
+        // We choose 2000 temp directories to test workaround for http://openradar.appspot.com/50553219
+        for _ in 1...2000 {
+            let tempDir = archive.uniqueTemporaryDirectoryURL()
+            XCTAssertFalse(tempURLs.contains(tempDir), "Temp directory URL should be unique. \(tempDir)")
+            tempURLs.insert(tempDir)
+        }
     }
 }
